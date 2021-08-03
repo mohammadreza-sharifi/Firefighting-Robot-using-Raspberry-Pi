@@ -6,6 +6,11 @@ io.setwarnings(False)
 io.setmode(io.BOARD)
 
 #define driver pins
+#IN1 = 3
+#IN2 = 5
+#IN3 = 8
+#in4 = 10
+#setup driver pins
 io.setup(3,io.OUT)#IN1
 io.setup(5,io.OUT)#IN2
 io.setup(8,io.OUT)#IN3
@@ -98,3 +103,4 @@ while True:
 
 cv2.destroyAllWindows()
 cap.release()
+io.cleanup()
