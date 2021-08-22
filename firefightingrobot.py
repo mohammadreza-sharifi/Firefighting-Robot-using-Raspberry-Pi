@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
 import RPi.GPIO as io
+import sys
+import Adafruit_DHT
 
 io.setwarnings(False)
 io.setmode(io.BOARD)
@@ -18,6 +20,20 @@ io.setup(10,io.OUT)#IN4
 
 #define micro water pump pin 
 io.setup(40,io.OUT)
+
+#define fire detector sensor pin
+io.setup(38,io.IN)
+
+#define buzzer pin
+io.setup(36,io.OUT)
+
+def firealarm():
+    alarm = io.input(38)
+    if alarm == True:
+        io.output(36,1)
+    else:
+        io.output(36,0)
+        
 
 #this function moves the robot forward
 def forward():
@@ -59,6 +75,7 @@ cap = cv2.VideoCapture(0)
 
 while True:
     ret , frame = cap.read()
+    humidity, temp = Adafruit_DHT.read_retry(11, 4)
 
     blur = cv2.GaussianBlur(frame,(21,21),0)
     hsv = cv2.cvtColor(blur,cv2.COLOR_BGR2HSV)
@@ -72,9 +89,12 @@ while True:
 
     output = cv2.bitwise_and(frame , hsv , mask = mask)
     no_red = cv2.countNonZero(mask)
+    fireimage = image = cv2.putText(output,str(temp), (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1,(255,255,255),2,cv2.LINE_AA)
+
+    #cv2.imshow("camera",frame)
+    cv2.imshow("fire detector",fireimage)
     
-    cv2.imshow("camera",frame)
-    cv2.imshow("fire detector",output)
+    firealarm()
     
     #control the robot by computer keyboard
     #i control the robot from VNC viewer
